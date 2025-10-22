@@ -34,16 +34,21 @@ PSQL_CMD=$(make_psql_cmd "-U hive metastore")
 # import dump
 DUMP_FILE="$(basename "$HOST_DUMP_FILE")"
 # TODO: reactivate!
-#printf "\n\nsetup database\n"
-#podman cp "setup.sql" "$IMPORT_CONTAINER:/tmp/setup.sql"
-#exec_cmd "$IMPORT_CONTAINER" "cat /tmp/setup.sql | $(make_psql_cmd "postgres")"
+printf "\n\nsetup database\n"
+# podman cp "setup.sql" "$IMPORT_CONTAINER:/tmp/setup.sql"
+# exec_cmd "$IMPORT_CONTAINER" "cat /tmp/setup.sql | $(make_psql_cmd "postgres")"
+# 
+# printf "\n\nimport dump\n"
+# podman cp "$HOST_DUMP_FILE" "$IMPORT_CONTAINER:/tmp/$DUMP_FILE"
+# exec_cmd "$IMPORT_CONTAINER" "(printf '\\c metastore\n'; zstdcat '/tmp/$DUMP_FILE') | $PSQL_CMD"
+# 
+# 
+# podman cp "cleanup.sql" "$IMPORT_CONTAINER:/tmp/cleanup.sql"
+# exec_cmd "$IMPORT_CONTAINER" "(printf '\\c metastore\n'; cat /tmp/cleanup.sql) | $PSQL_CMD"
+
+# TODO
+# - remove temporary files
+# - create image:
+#   podman commit --include-volumes -q hive-postgres-metastore-import <image name, e.g., hive-postgres-metastore-tpc-ds-30tb-cleaned-up>
 #
-#printf "\n\nimport dump\n"
-#podman cp "$HOST_DUMP_FILE" "$IMPORT_CONTAINER:/tmp/$DUMP_FILE"
-#exec_cmd "$IMPORT_CONTAINER" "(printf '\\c metastore\n'; zstdcat '/tmp/$DUMP_FILE') | $PSQL_CMD"
-
-
-podman cp "cleanup.sql" "$IMPORT_CONTAINER:/tmp/cleanup.sql"
-exec_cmd "$IMPORT_CONTAINER" "(printf '\\c metastore\n'; cat /tmp/cleanup.sql) | $PSQL_CMD"
-
-
+#
