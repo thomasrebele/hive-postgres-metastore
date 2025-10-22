@@ -9,9 +9,7 @@
 DROP TABLE IF EXISTS "TMP_DATABASE_RENAMING";
 CREATE TABLE "TMP_DATABASE_RENAMING" as (SELECT "NAME" as "orig", "NAME" as "renamed", 1 as "new_db_id" FROM "DBS" WHERE 1=0);
 INSERT INTO "TMP_DATABASE_RENAMING" VALUES
-  ('tpcds_bin_partitioned_orc_30000', 'default', 1),
-  ('sys', 'sys', 2),
-  ('information_schema', 'information_schema', 3);
+  ('tpcds_bin_partitioned_orc_30000', 'default', 1);
 
 -- Create helper tables
 DROP TABLE IF EXISTS "TMP_TABLES_TO_DELETE";
@@ -146,4 +144,4 @@ DROP TABLE IF EXISTS "TMP_TABLES_TO_DELETE";
 DROP TABLE IF EXISTS "TMP_PARTITIONS_TO_DELETE";
 DROP TABLE IF EXISTS "TMP_TABLE_RENAMING";
 DROP TABLE IF EXISTS "TMP_PARTITION_RENAMING";
-
+DROP TABLE IF EXISTS "TMP_DBS";

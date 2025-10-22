@@ -47,6 +47,6 @@ exec_cmd "$IMPORT_CONTAINER" "(printf '\\c metastore\n'; cat /tmp/cleanup.sql) |
 
 exec_cmd "$IMPORT_CONTAINER" "rm /tmp/$DUMP_FILE; rm /tmp/setup.sql; rm /tmp/cleanup.sql"
 
-exec_cmd "$IMPORT_CONTAINER" 'su -l postgres -s /usr/bin/perl -- /usr/bin/pg_dump metastore' | zstd -10 > clean-dump.zstd
+exec_cmd "$IMPORT_CONTAINER" 'su -l postgres -s /usr/bin/perl -- /usr/bin/pg_dump metastore' | zstd -10 > ../build-container/metastore_dump.zstd
 
 
