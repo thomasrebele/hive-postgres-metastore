@@ -1,4 +1,4 @@
-FROM citusdata/citus:latest
+FROM citusdata/citus:alpine
 
 COPY metastore_dump.zstd /tmp/metastore_dump.zstd
 COPY postgresql.conf /etc/postgresql/postgresql.conf
