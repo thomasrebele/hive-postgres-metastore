@@ -1,12 +1,17 @@
 #!/bin/bash
 
-if [ "$0" == "" ]; then
+################################################################################
+# Helper script to cleanup the dump (remove unnecessary Hive databases).
+# See cleanup.sql.
+################################################################################
+
+if [ "$1" == "" ]; then
   echo "usage: <histogram-dump.zstd>"
   exit
 fi
 
 HOST_DUMP_FILE="$1"
-IMPORT_CONTAINER="hive-postgres-metastore-import"
+IMPORT_CONTAINER="hive-postgres-metastore-cleanup"
 
 # check dump file
 if ! zstdcat "$HOST_DUMP_FILE" | head | grep -q -- "-- ""PostgreSQL database dump" > /dev/null; then
@@ -31,22 +36,25 @@ make_psql_cmd() {
 }
 PSQL_CMD=$(make_psql_cmd "-U hive metastore")
 
-# import dump
-DUMP_FILE="$(basename "$HOST_DUMP_FILE")"
+# setup database (execute setup.sql)
 printf "\n\nsetup database\n"
 podman cp "setup.sql" "$IMPORT_CONTAINER:/tmp/setup.sql"
 exec_cmd "$IMPORT_CONTAINER" "cat /tmp/setup.sql | $(make_psql_cmd "postgres")"
 
+# import dump
+DUMP_FILE="$(basename "$HOST_DUMP_FILE")"
 printf "\n\nimport dump\n"
 podman cp "$HOST_DUMP_FILE" "$IMPORT_CONTAINER:/tmp/$DUMP_FILE"
 exec_cmd "$IMPORT_CONTAINER" "(printf '\\c metastore\n'; zstdcat '/tmp/$DUMP_FILE') | $PSQL_CMD"
 
-
+# cleanup the metastore
 podman cp "cleanup.sql" "$IMPORT_CONTAINER:/tmp/cleanup.sql"
 exec_cmd "$IMPORT_CONTAINER" "(printf '\\c metastore\n'; cat /tmp/cleanup.sql) | $PSQL_CMD"
 
+# remove temporary files
 exec_cmd "$IMPORT_CONTAINER" "rm /tmp/$DUMP_FILE; rm /tmp/setup.sql; rm /tmp/cleanup.sql"
 
-exec_cmd "$IMPORT_CONTAINER" 'su -l postgres -s /usr/bin/perl -- /usr/bin/pg_dump metastore' | zstd -10 > ../step2/metastore_dump.zstd
+# dump the metastore for the next step
+exec_cmd "$IMPORT_CONTAINER" 'su -l postgres -s /usr/bin/perl -- /usr/bin/pg_dump metastore' | zstd -T0 -15 > ../step2/metastore_dump.zstd
 
 
