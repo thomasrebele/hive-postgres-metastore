@@ -8,15 +8,17 @@
 
 (printf "
   CREATE EXTENSION citus_columnar;\n
-  set columnar.compression_level=15;\n
-  set columnar.stripe_row_limit=1000000;\n";
-  zstdcat /tmp/metastore-dump.zstd;
+  set columnar.compression_level=10;\n
+  set columnar.stripe_row_limit=100000;\n";
+  zstdcat /tmp/metastore_dump.zstd;
+  printf "ALTER TABLE public.\"VERSION\" SET ACCESS METHOD heap;\n";
 ) | awk '
   /^SET default_table_access_method/ {print "SET default_table_access_method = columnar;"; next}
-  # append "USING columnar" to the CREATE TABLE statements
-  /^CREATE TABLE public./ {FOUND=1}
-  /^$/ {FOUND=0}
-  /^);\s/ { print ") USING columnar;"; next}
+  # append "USING columnar" to the CREATE TABLE statements, except the VERSION table
+  /^CREATE TABLE public./ {am="columnar"}
+  /^CREATE TABLE public."VERSION"/ {am="heap"}
+  am!="" && /^);\s/ { print ") USING " am ";"; next}
+  /;[ \r]*$/ {am=""}
   # by default print the line
   {print $0}' | psql metastore || true
 
