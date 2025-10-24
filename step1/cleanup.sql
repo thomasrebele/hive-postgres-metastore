@@ -5,9 +5,13 @@
 
 -- Configuration
 
--- TODO: add comment
 DROP TABLE IF EXISTS "TMP_DATABASE_RENAMING";
 CREATE TABLE "TMP_DATABASE_RENAMING" as (SELECT "NAME" as "orig", "NAME" as "renamed", 1 as "new_db_id" FROM "DBS" WHERE 1=0);
+
+-- You may update the content of this table
+-- The format of the rows:
+-- ('name of the database in the input dump', 'desired name of the database', database_id)
+-- I recommend to have a database named 'default'
 INSERT INTO "TMP_DATABASE_RENAMING" VALUES
   ('tpcds_bin_partitioned_orc_30000', 'default', 1);
 
