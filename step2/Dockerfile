@@ -1,8 +1,8 @@
 FROM postgres:alpine3.22
 
 COPY metastore_dump.zstd /tmp/metastore_dump.zstd
+COPY postgresql-*.conf /etc/postgresql/
 COPY postgresql-load.conf /etc/postgresql/postgresql.conf
-COPY postgresql-run.conf /etc/postgresql/postgresql-run.conf
 RUN chown postgres:postgres /etc/postgresql/postgresql*.conf
 
 COPY init_user_db.sql /docker-entrypoint-initdb.d/init_user_db.sql
