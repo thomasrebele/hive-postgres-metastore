@@ -4,6 +4,12 @@ tag=postgres-tpcds-metastore-step2:1.5
 
 #podman build --tag "$tag" .
 
+tgt_file="../step3/metastore_db.zstd"
+if [ -f "$tgt_file" ]; then
+  printf "Error: file %s already exists\n" "$tgt_file"
+  exit 1
+fi
+
 echo "create and start container:"
 c_src=$(podman create -e POSTGRES_PASSWORD=postgres "$tag")
 podman container start "$c_src" | sed -u 's/^/  /'
