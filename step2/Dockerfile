@@ -1,4 +1,4 @@
-FROM postgres:alpine3.22
+FROM postgres:18-alpine
 
 COPY metastore_dump.zstd /tmp/metastore_dump.zstd
 COPY postgresql-*.conf /etc/postgresql/
