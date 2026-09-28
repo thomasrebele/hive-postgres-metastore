@@ -12,6 +12,8 @@ A Hive metastore dump comperessed with zstd. You can get it from a Hive metastor
 
 ### Instructions
 
+Here an example how to use the scripts. Change the tag of the image in the commands, or just increase the version number if you want to publish it.
+
 -   Install [Podman](https://podman.io/) (or alternatively [Docker](https://www.docker.com/),
     though you would need to replace "podman" with "docker" in the scripts).
 -   Configure the database renaming in `step1/cleanup.sql`.
@@ -19,9 +21,9 @@ A Hive metastore dump comperessed with zstd. You can get it from a Hive metastor
 -   Execute `cd step1; ./import-metastore.sh /path/to/your/metastore_dump.zstd` in another terminal.
     This will create a file `step2/metastore_dump.zstd` containing a dump of the cleaned up metastore.
     Once the script is done you can kill the start-containers.sh with Ctrl+C.
--   Execute `cd step2; podman build --tag postgres-tpcds-metastore:1.4 .`.
-    This will build the docker image. Change the tag of the image,
-    or just increase the version number if you want to publish it.
+-   Execute `cd step2; ./step2.sh postgres-tpcds-metastore-step2:1.5 .`.
+    This will import the dump, compact the database, and create a raw dump of the Postgres DB.
+-   Execute `cd step3; podman build --tag postgres-tpcds-metastore:1.5 .`
 
 The image should appear in `podman image ls` as
 `localhost/postgres-tpcds-metastore`

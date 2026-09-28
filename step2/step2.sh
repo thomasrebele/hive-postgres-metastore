@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 
-tag=postgres-tpcds-metastore-step2:1.5
+tag="$1"
 
-#podman build --tag "$tag" .
+if [ "$tag" == "" ]; then
+  echo "Error: specify the image tag as the first argument"
+  exit 1
+fi
 
 tgt_file="../step3/metastore_db.zstd"
 if [ -f "$tgt_file" ]; then
