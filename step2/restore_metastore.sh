@@ -5,6 +5,9 @@
 # The postgres commands may exit with non-blocking errors so we shouldn't stop the script
 # since in many cases the dump will be restored correctly.
 
+# the next start of the container
+cp /usr/local/bin/docker-entrypoint.sh /tmp/docker-entrypoint.sh.original
+
 cpus="$(nproc --all || echo 1)"
 pg_restore -d metastore -j "$cpus" /tmp/metastore_dump.zstd || true
 
@@ -12,10 +15,12 @@ sleep 5
 
 printf "CHECKPOINT;\n" | psql
 
-sleep 60
+sleep 5
 
-echo "disk usage:"
-du -hs /var/lib/postgresql/
+echo "disk usage:" > /dev/stderr
+du -s /var/lib/postgresql/ > /dev/stderr
+echo "WAL disk usage:" > /dev/stderr
+du -s /var/lib/postgresql/18/docker/pg_wal > /dev/stderr
 
 # replace the postgres config (reduces disk space requirements)
 cat /etc/postgresql/postgresql-run.conf > /etc/postgresql/postgresql.conf
